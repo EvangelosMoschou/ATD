@@ -1,0 +1,28 @@
+# MATLAB and Simulink
+*.asv
+*.mex*
+*.slxc
+*.mat
+*.jnl
+*.log
+*.p
+*.slx.original.zip
+
+# Simulink project folders
+sl_cache/
+codegen_out/
+tmp_pdf/
+work/
+
+# C-port artifacts
+c_port/bin/
+c_port/out/
+*.o
+*.exe
+*.a
+*.so
+
+# System/Misc
+.DS_Store
+Thumbs.db
+.cache/
