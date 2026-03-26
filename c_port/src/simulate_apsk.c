@@ -7,6 +7,7 @@
 #include <time.h>
 
 #include "rrc_link.h"
+#include "prng.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -77,6 +78,7 @@ int main(int argc, char** argv) {
     }
 
     unsigned int seed = (unsigned int)time(NULL);
+    int avg_windows = 1;
 
     opts.sps = sps;
     opts.filter_span_symbols = span;
@@ -86,6 +88,8 @@ int main(int argc, char** argv) {
     opts.export_spectrum = 1;
     opts.spectrum_capture_db = 10.0;
     opts.spectrum_fft_len = 1024;
+    opts.use_gray_coding = 1;
+    opts.ring_bits = 3;
 
     int do64 = 1;
     int do256 = 1;
@@ -114,12 +118,23 @@ int main(int argc, char** argv) {
         }
         seed = (unsigned int)v;
     }
-    srand(seed);
+    prng_seed((uint32_t)seed);
     printf("apsk RNG seed=%u\n", seed);
+
+    const char* avg_env = getenv("SPECTRUM_AVG_WINDOWS");
+    if (avg_env && *avg_env) {
+        char* end = NULL;
+        errno = 0;
+        const long v = strtol(avg_env, &end, 10);
+        if (errno == 0 && end != avg_env && *end == '\0' && v >= 1) {
+            avg_windows = (int)v;
+        }
+    }
+    printf("apsk spectrum_avg_windows=%d\n", avg_windows);
 
     if (do64) {
         opts.carrier_hz = 24.125e9;
-        const int rc = simulate_modulated_link("64apsk", c64, 64, 6, 8000, 10.0, 5000, &opts);
+        const int rc = simulate_modulated_link("64apsk", c64, 64, 6, 200000, 10.0, 5000, &opts);
         if (rc != 0) {
             return rc;
         }
@@ -128,7 +143,8 @@ int main(int argc, char** argv) {
     if (do256) {
         opts.carrier_hz = 11.2e9;
         opts.spectrum_capture_db = 12.0;
-        const int rc = simulate_modulated_link("256apsk", c256, 256, 8, 6000, 12.0, 6000, &opts);
+        const int rc = simulate_modulated_link("256apsk", c256, 256, 8, 200000, 12.0, 6000, &opts);
+        opts.spectrum_avg_windows = avg_windows;
         if (rc != 0) {
             return rc;
         }

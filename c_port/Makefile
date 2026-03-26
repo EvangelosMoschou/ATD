@@ -3,6 +3,7 @@ CFLAGS := -O3 -std=c11 -Wall -Wextra -Wpedantic
 LDFLAGS := -lm
 CPPFLAGS := -Iinclude
 SEED ?=
+AVG_WINDOWS ?= 1
 
 SRC_DIR := src
 BIN_DIR := bin
@@ -23,15 +24,15 @@ SRCS := $(SRC_DIR)/main.c $(SRC_DIR)/propagation_losses.c
 PLOT_TARGET := $(BIN_DIR)/plot_propagation_svg
 PLOT_SRCS := $(SRC_DIR)/plot_propagation_svg.c
 SIM8_TARGET := $(BIN_DIR)/simulate_8psk
-SIM8_SRCS := $(SRC_DIR)/simulate_8psk.c $(SRC_DIR)/rrc_link.c
+SIM8_SRCS := $(SRC_DIR)/simulate_8psk.c $(SRC_DIR)/rrc_link.c $(SRC_DIR)/prng.c
 PLOT8_TARGET := $(BIN_DIR)/plot_8psk_svg
-PLOT8_SRCS := $(SRC_DIR)/plot_8psk_svg.c
+PLOT8_SRCS := $(SRC_DIR)/plot_8psk_svg.c $(SRC_DIR)/svg_utils.c
 SIMAPSK_TARGET := $(BIN_DIR)/simulate_apsk
-SIMAPSK_SRCS := $(SRC_DIR)/simulate_apsk.c $(SRC_DIR)/rrc_link.c
+SIMAPSK_SRCS := $(SRC_DIR)/simulate_apsk.c $(SRC_DIR)/rrc_link.c $(SRC_DIR)/prng.c
 PLOTAPSK_TARGET := $(BIN_DIR)/plot_apsk_svg
-PLOTAPSK_SRCS := $(SRC_DIR)/plot_apsk_svg.c
+PLOTAPSK_SRCS := $(SRC_DIR)/plot_apsk_svg.c $(SRC_DIR)/svg_utils.c
 PLOTSPEC_TARGET := $(BIN_DIR)/plot_spectrum_svg
-PLOTSPEC_SRCS := $(SRC_DIR)/plot_spectrum_svg.c
+PLOTSPEC_SRCS := $(SRC_DIR)/plot_spectrum_svg.c $(SRC_DIR)/svg_utils.c
 
 .PHONY: all clean run plot sim8 plot8 sim64 sim256 plot64 plot256 plotapsk plotall dirs tidy
 
@@ -69,24 +70,24 @@ plot: all
 	mv -f $(CSV_PROP)/propagation_losses.svg $(SVG_PROP)/
 
 sim8: all
-	cd $(CSV_8) && ../../..//$(SIM8_TARGET) $(SEED)
+	cd $(CSV_8) && SPECTRUM_AVG_WINDOWS=$(AVG_WINDOWS) ../../..//$(SIM8_TARGET) $(SEED)
 
 plot8: all
-	cd $(CSV_8) && ../../..//$(SIM8_TARGET) $(SEED) && ../../..//$(PLOT8_TARGET) && ../../..//$(PLOTSPEC_TARGET) 8
+	cd $(CSV_8) && SPECTRUM_AVG_WINDOWS=$(AVG_WINDOWS) ../../..//$(SIM8_TARGET) $(SEED) && ../../..//$(PLOT8_TARGET) && ../../..//$(PLOTSPEC_TARGET) 8
 	mv -f $(CSV_8)/*.svg $(SVG_8)/
 
 sim64: all
-	cd $(CSV_64) && ../../..//$(SIMAPSK_TARGET) 64 $(SEED)
+	cd $(CSV_64) && SPECTRUM_AVG_WINDOWS=$(AVG_WINDOWS) ../../..//$(SIMAPSK_TARGET) 64 $(SEED)
 
 sim256: all
-	cd $(CSV_256) && ../../..//$(SIMAPSK_TARGET) 256 $(SEED)
+	cd $(CSV_256) && SPECTRUM_AVG_WINDOWS=$(AVG_WINDOWS) ../../..//$(SIMAPSK_TARGET) 256 $(SEED)
 
 plot64: all
-	cd $(CSV_64) && ../../..//$(SIMAPSK_TARGET) 64 $(SEED) && ../../..//$(PLOTAPSK_TARGET) 64 && ../../..//$(PLOTSPEC_TARGET) 64
+	cd $(CSV_64) && SPECTRUM_AVG_WINDOWS=$(AVG_WINDOWS) ../../..//$(SIMAPSK_TARGET) 64 $(SEED) && ../../..//$(PLOTAPSK_TARGET) 64 && ../../..//$(PLOTSPEC_TARGET) 64
 	mv -f $(CSV_64)/*.svg $(SVG_64)/
 
 plot256: all
-	cd $(CSV_256) && ../../..//$(SIMAPSK_TARGET) 256 $(SEED) && ../../..//$(PLOTAPSK_TARGET) 256 && ../../..//$(PLOTSPEC_TARGET) 256
+	cd $(CSV_256) && SPECTRUM_AVG_WINDOWS=$(AVG_WINDOWS) ../../..//$(SIMAPSK_TARGET) 256 $(SEED) && ../../..//$(PLOTAPSK_TARGET) 256 && ../../..//$(PLOTSPEC_TARGET) 256
 	mv -f $(CSV_256)/*.svg $(SVG_256)/
 
 plotapsk: all

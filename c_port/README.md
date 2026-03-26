@@ -23,10 +23,13 @@
 - make plotall: Run 8-PSK + APSK pipelines and generate all figures
 - make clean: Remove bin/ and out/
 - make plotall SEED=12345: Regenerate all figures with deterministic RNG seed
+- make plotall AVG_WINDOWS=1: Single FFT snapshot (rougher spectrum)
+- make plotall AVG_WINDOWS=16: Average 16 FFT windows (smoother spectrum)
 
 ## Reproducible runs
 - By default, simulators use time-based seed.
 - Set `SEED=<integer>` in Make targets to lock BER/constellation/spectrum outputs.
+- Set `AVG_WINDOWS=<integer>` to control spectrum smoothing (default `1`).
 - Example: `make clean && make plotall SEED=12345`
 
 ## Diagnostics generated per modulation

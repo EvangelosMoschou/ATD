@@ -18,6 +18,9 @@ typedef struct LinkOptions {
     int export_spectrum;
     double spectrum_capture_db;
     int spectrum_fft_len;
+    int spectrum_avg_windows;
+    int use_gray_coding;
+    int ring_bits;
 } LinkOptions;
 
 int normalize_constellation(Complex* c, int m);
